@@ -12,7 +12,7 @@ class _ChatCardState extends State<ChatCard> {
   Widget build(BuildContext context) {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      margin: EdgeInsets.all(20),
+      margin: EdgeInsets.fromLTRB(20, 10, 20, 10),
       child: InkWell(
         onTap: (){},
         child: ListTile(
