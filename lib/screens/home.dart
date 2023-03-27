@@ -1,7 +1,8 @@
+import 'package:chat_app/authentication/authentication.dart';
+import 'package:chat_app/screens/login.dart';
 import 'package:chat_app/widgets/card_widget.dart';
 import 'package:chat_app/widgets/textField.dart';
 import 'package:flutter/material.dart';
-
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -29,15 +30,20 @@ class _HomeState extends State<Home> {
         centerTitle: true,
         actions: [
           IconButton(
-              onPressed: () {},
+              onPressed: () async {
+                final result = await AuthService().SignOut();
+                if(result!.contains('success'))
+                {
+                  Navigator.push(context, MaterialPageRoute(builder: ((context) => Login())));
+                }
+              },
               icon: Icon(
-                Icons.person_sharp,
+                Icons.logout_rounded,
                 color: Colors.white,
                 size: 27,
               ))
         ],
       ),
-    
       drawer: Drawer(),
       body: Column(
         children: [
@@ -46,9 +52,8 @@ class _HomeState extends State<Home> {
             child: searchTextField(text: 'Search messages'),
           ),
           Expanded(
-
             child: ListView.builder(
-              physics: BouncingScrollPhysics(),
+                physics: BouncingScrollPhysics(),
                 itemCount: 2,
                 itemBuilder: ((context, index) {
                   return ChatCard();
