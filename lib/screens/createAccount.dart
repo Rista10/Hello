@@ -30,7 +30,7 @@ class RegisterPage extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: CircleAvatar(
-                radius: 60,
+                radius: 65,
                 child: IconButton(
                     onPressed: () {},
                     icon: Icon(
