@@ -1,6 +1,8 @@
 import 'package:chat_app/authentication/authentication.dart';
+import 'package:chat_app/models/userModel.dart';
 import 'package:chat_app/screens/createAccount.dart';
 import 'package:chat_app/screens/home.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -84,12 +86,28 @@ class _LoginState extends State<Login> {
                       color: Colors.white,
                     ),
                     onPressed: () async {
-                      final result = await AuthService().SignIn(
+                      final credential = await AuthService().SignIn(
                           emailText: emailController.text,
                           passwordText: passwordController.text);
-                      if (result!.contains('success')) {
+                     
+                      if (credential != null) {
+                        String uid = credential.user!.uid;
+
+                        DocumentSnapshot userData = await FirebaseFirestore
+                            .instance
+                            .collection('users')
+                            .doc(uid)
+                            .get();
+
+                        UserModel? userModel = UserModel.fromMap(
+                            userData.data() as Map<String, dynamic>);
+                     
                         Navigator.push(
-                            context, MaterialPageRoute(builder: (context)=>Home()));
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Home(
+                                    userModel: userModel,
+                                    firebaseUser: credential.user!)));
                       }
                     },
                     label: Text(
@@ -102,7 +120,6 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 ),
-
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -124,7 +141,9 @@ class _LoginState extends State<Login> {
                             fontSize: 15,
                           )),
                     ),
-              ],),],
+                  ],
+                ),
+              ],
             ),
           )
         ],

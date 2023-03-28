@@ -1,17 +1,18 @@
+
+
+import 'package:chat_app/models/userModel.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import '/services/database_service.dart';
 import 'package:flutter/material.dart';
 
 class AuthService {
-  Future<String?> SignIn(
+  Future<UserCredential?> SignIn(
       {required String emailText, required String passwordText}) async {
     try {
       UserCredential credential = await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: emailText, password: passwordText);
-      print('success');
-      return 'success';
+      return credential;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         print('No user found for that email.');
@@ -32,11 +33,23 @@ class AuthService {
       UserCredential user = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(
               email: emailText, password: passwordText);
-      DatabaseService().addUser(
-          name: name,
+
+      if (user != null) {
+        String uid = user.user!.uid;
+        UserModel newUser = UserModel(
+          uid: uid,
           email: emailText,
+          address: addressText,
+          fullName: name,
           number: numberText,
-          address: addressText);
+        );
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .set(newUser.toMap())
+            .then((value) => 'New user created');
+        return 'success';
+      }
     } catch (e) {
       print('error');
       return 'error adding user';

@@ -1,3 +1,5 @@
+import 'package:chat_app/authentication/authentication.dart';
+import 'package:chat_app/screens/login.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -56,7 +58,7 @@ class RegisterPage extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: 'Phone number',
               ),
-              obscureText: true,
+            
             ),
           ),
           Padding(
@@ -66,7 +68,7 @@ class RegisterPage extends StatelessWidget {
               decoration: InputDecoration(
                 hintText: 'Address',
               ),
-              obscureText: true,
+         
             ),
           ),
           Padding(
@@ -97,7 +99,18 @@ class RegisterPage extends StatelessWidget {
                   color: Colors.green[300],
                   borderRadius: BorderRadius.circular(12)),
               child: TextButton.icon(
-                onPressed: () {},
+                onPressed: () async {
+                  final result = await AuthService().CreateAccount(
+                      name: nameController.text,
+                      emailText: emailController.text,
+                      numberText: numberController.text,
+                      addressText: addressController.text,
+                      passwordText: passwordController.text);
+                  if (result!.contains('success')) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Login()));
+                  }
+                },
                 icon: Icon(
                   Icons.login_rounded,
                   color: Colors.white,

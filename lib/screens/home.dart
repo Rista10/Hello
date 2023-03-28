@@ -1,17 +1,22 @@
 import 'package:chat_app/authentication/authentication.dart';
+import 'package:chat_app/models/userModel.dart';
 import 'package:chat_app/screens/login.dart';
 import 'package:chat_app/widgets/card_widget.dart';
 import 'package:chat_app/widgets/textField.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Home extends StatefulWidget {
-  const Home({super.key});
+  final UserModel? userModel;
+  final User? firebaseUser;
+  const Home({super.key, required this.userModel, required this.firebaseUser});
 
   @override
   State<Home> createState() => _HomeState();
 }
 
 class _HomeState extends State<Home> {
+  TextEditingController searchController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,9 +37,9 @@ class _HomeState extends State<Home> {
           IconButton(
               onPressed: () async {
                 final result = await AuthService().SignOut();
-                if(result!.contains('success'))
-                {
-                  Navigator.push(context, MaterialPageRoute(builder: ((context) => Login())));
+                if (result!.contains('success')) {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: ((context) => Login())));
                 }
               },
               icon: Icon(
@@ -49,7 +54,8 @@ class _HomeState extends State<Home> {
         children: [
           Padding(
             padding: EdgeInsets.all(20),
-            child: searchTextField(text: 'Search messages'),
+            child: SearchTextField(
+                text: 'Search messages', searchController: searchController),
           ),
           Expanded(
             child: ListView.builder(
