@@ -1,6 +1,7 @@
 import 'package:chat_app/main.dart';
 import 'package:chat_app/models/chatRoomModel.dart';
 import 'package:chat_app/models/firebaseHelper.dart';
+import 'package:chat_app/models/messageModel.dart';
 import 'package:chat_app/models/userModel.dart';
 import 'package:chat_app/screens/chatRoom.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -109,19 +110,17 @@ class _SearchTextFieldState extends State<SearchTextField> {
                           onTap: () async {
                             ChatRoomModel? chatroomModel =
                                 await getChatroomModel(searchedUser);
-                                if(chatroomModel!=null)
-                                {
-                                  Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ChatPage(
-                                          targetUser: searchedUser,
-                                          chatRoom: chatroomModel,
-                                          userModel: widget.userModel!,
-                                          firebaseUser: widget.firebaseUser!,
-                                        )));
-                                }
-                            
+                            if (chatroomModel != null) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ChatPage(
+                                            targetUser: searchedUser,
+                                            chatRoom: chatroomModel,
+                                            userModel: widget.userModel!,
+                                            firebaseUser: widget.firebaseUser!,
+                                          )));
+                            }
                           }),
                     );
                   } else {
@@ -150,25 +149,72 @@ class _SearchTextFieldState extends State<SearchTextField> {
   }
 }
 
-messageTextField({required String? text}) {
-  return Padding(
-    padding: const EdgeInsets.all(18),
-    child: TextField(
-        decoration: InputDecoration(
-      filled: true,
-      fillColor: Colors.grey[200],
-      suffixIcon: IconButton(
-        onPressed: () {},
-        icon: Icon(
-          Icons.send,
-          color: Colors.amber,
-        ),
-      ),
-      hintText: text,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(20),
-        borderSide: BorderSide.none,
-      ),
-    )),
-  );
+class messageTextField extends StatefulWidget {
+  final String? text;
+  final TextEditingController messageController;
+  final UserModel userModel;
+  final ChatRoomModel chatRoom;
+
+  const messageTextField(
+      {super.key,
+      this.text,
+      required this.messageController,
+      required this.userModel,
+      required this.chatRoom});
+
+  @override
+  State<messageTextField> createState() => _messageTextFieldState();
+}
+
+class _messageTextFieldState extends State<messageTextField> {
+  void sendMessage() async {
+    String msg = widget.messageController.text.trim();
+    if (msg != null) {
+      MessageModel newMessage = MessageModel(
+        messageId: uuid.v1(),
+        sender: widget.userModel.uid,
+        text: msg,
+        createdOn: DateTime.now(),
+        seen: false,
+      );
+
+      FirebaseFirestore.instance
+          .collection('chatrooms')
+          .doc(widget.chatRoom.chatRoomId)
+          .collection('messages')
+          .doc(newMessage.messageId)
+          .set(newMessage.toMap());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(18),
+      child: TextField(
+        maxLines: null,
+          controller: widget.messageController,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: Colors.grey[200],
+            suffixIcon: IconButton(
+              onPressed: () {},
+              icon: IconButton(
+                onPressed: () {
+                  sendMessage();
+                  print('Message sent');
+                },
+                icon: Icon(Icons.send),
+                color: Colors.amber,
+              ),
+            ),
+          
+            hintText: widget.text,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(20),
+              borderSide: BorderSide.none,
+            ),
+          )),
+    );
+  }
 }
