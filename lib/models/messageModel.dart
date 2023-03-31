@@ -11,7 +11,7 @@ class MessageModel {
     messageId = map['messageId'];
     sender = map['sender'];
     text = map['text'];
-    createdOn = map['createdOn'];
+    createdOn = map['createdOn'].toDate();
     seen = map['seen'];
   }
 
