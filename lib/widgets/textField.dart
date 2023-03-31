@@ -185,14 +185,19 @@ class _messageTextFieldState extends State<messageTextField> {
           .doc(newMessage.messageId)
           .set(newMessage.toMap());
     }
+    widget.chatRoom.lastMessage = msg;
+    FirebaseFirestore.instance
+        .collection('chatrooms')
+        .doc(widget.chatRoom.chatRoomId)
+        .set(widget.chatRoom.toMap());
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.fromLTRB(18, 32, 18, 18),
       child: TextField(
-        maxLines: null,
+        
           controller: widget.messageController,
           decoration: InputDecoration(
             filled: true,
@@ -208,7 +213,6 @@ class _messageTextFieldState extends State<messageTextField> {
                 color: Colors.amber,
               ),
             ),
-          
             hintText: widget.text,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(20),

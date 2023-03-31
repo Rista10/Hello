@@ -54,11 +54,12 @@ class _ChatPageState extends State<ChatPage> {
       body: Column(children: [
         Expanded(
           child: Container(
+            padding:EdgeInsets.symmetric(horizontal:10),
             child: StreamBuilder(
                 stream: FirebaseFirestore.instance
                     .collection('chatrooms')
                     .doc(widget.chatRoom.chatRoomId)
-                    .collection('messages')
+                    .collection('messages').orderBy('createdOn',descending: true)
                     .snapshots(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.active) {
@@ -66,12 +67,47 @@ class _ChatPageState extends State<ChatPage> {
                       QuerySnapshot datasnapShot =
                           snapshot.data as QuerySnapshot;
                       return ListView.builder(
+                        reverse: true,
                         itemCount: datasnapShot.docs.length,
                         itemBuilder: (context, index) {
                           MessageModel currentMessage = MessageModel.fromMap(
                               datasnapShot.docs[index].data()
                                   as Map<String, dynamic>);
-                          return Text(currentMessage.text.toString());
+                          return Row(
+                            mainAxisAlignment: (currentMessage.sender==widget.userModel.uid)?MainAxisAlignment.end:MainAxisAlignment.start,
+                            children: [
+                              Container(
+                                margin: EdgeInsets.symmetric(
+                                  vertical:2,
+                                  
+                                ),
+                                padding: EdgeInsets.symmetric(vertical:12,horizontal:12),
+                                decoration: BoxDecoration(
+                                  color:(currentMessage.sender==widget.userModel.uid)? Colors.amber:Colors.white,
+                                  borderRadius:(currentMessage.sender==widget.userModel.uid)? 
+                                  BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    topRight: Radius.circular(15),
+                                    bottomLeft: Radius.circular(15),
+                                  ): BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    topRight: Radius.circular(15),
+                                    bottomRight: Radius.circular(15),
+                                  )
+                                ),
+                                child: Text(currentMessage.text.toString(),
+                                style: TextStyle(
+                                  color: (currentMessage.sender==widget.userModel.uid)? 
+                                  Colors.white:Colors.black,
+                                  fontSize: 16,
+                                  // fontWeight: FontWeight.bold,
+                                ),
+                                ),
+                              
+                                
+                                ),
+                            ],
+                          );
                         },
                       );
                     } else if (snapshot.hasError) {
@@ -82,7 +118,7 @@ class _ChatPageState extends State<ChatPage> {
                       return Center(child: Text('Say Hi to your new friend'));
                     }
                   } else {
-                    return Center(child: Text('Firebase not connected'));
+                    return Center(child: CircularProgressIndicator());
                   }
                 }),
           ),
@@ -92,6 +128,7 @@ class _ChatPageState extends State<ChatPage> {
             Container(
               height: 100,
               width: double.infinity,
+              margin: EdgeInsets.fromLTRB(0, 10, 0, 0),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(29),
                 color: Colors.white,
