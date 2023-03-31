@@ -5,8 +5,10 @@ import 'package:chat_app/screens/home.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:uuid/uuid.dart';
 import 'screens/login.dart';
 
+var uuid = Uuid();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -15,9 +17,8 @@ Future<void> main() async {
   if (user != null) {
     UserModel? thisUserModel = await fireBaseHelper.getUserModelById(user.uid);
     runApp(MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: HelloLoggedIn(userModel: thisUserModel, firebaseUser: user)
-    ));
+        debugShowCheckedModeBanner: false,
+        home: HelloLoggedIn(userModel: thisUserModel, firebaseUser: user)));
   } else {
     runApp(MaterialApp(
       debugShowCheckedModeBanner: false,

@@ -1,6 +1,7 @@
 import 'package:chat_app/authentication/authentication.dart';
 import 'package:chat_app/models/userModel.dart';
 import 'package:chat_app/screens/login.dart';
+import 'package:chat_app/screens/navBar.dart';
 import 'package:chat_app/widgets/card_widget.dart';
 import 'package:chat_app/widgets/textField.dart';
 import 'package:flutter/material.dart';
@@ -49,12 +50,12 @@ class _HomeState extends State<Home> {
               ))
         ],
       ),
-      drawer: Drawer(),
+      drawer: NavBar(userModel: widget.userModel!, user: widget.firebaseUser!),
       body: Column(
         children: [
           Padding(
-            padding: EdgeInsets.all(20),
-            child: SearchTextField(
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 10),
+            child: SearchTextField(userModel: widget.userModel!,firebaseUser: widget.firebaseUser!,
                 text: 'Search messages', searchController: searchController),
           ),
           Expanded(
